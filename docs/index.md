@@ -8,8 +8,8 @@ Mocha is a feature-rich JavaScript test framework running on [Node.js][] and in 
 
 <nav class="badges">
   <a href="https://gitter.im/mochajs/mocha"><img src="/images/join-chat.svg" height="18" alt="Gitter"></a>
-  <a href="#sponsors"><img src="https://opencollective.com/mochajs/sponsors/badge.svg" height="18" alt="OpenCollective sponsors"></a>
-  <a href="#backers"><img src="https://opencollective.com/mochajs/backers/badge.svg" height="18" alt="OpenCollective backers"></a>
+  <a href="#sponsors"><img src="https://opencollective.com/mochajs/tiers/sponsors/badge.svg" height="18" alt="OpenCollective sponsors"></a>
+  <a href="#backers"><img src="https://opencollective.com/mochajs/tiers/backers/badge.svg" height="18" alt="OpenCollective backers"></a>
 </nav>
 
 {% include supporters.md %}
@@ -64,7 +64,7 @@ or as a development dependency for your project:
 $ npm install --save-dev mocha
 ```
 
-> As of v8.0.0, Mocha requires Node.js v10.12.0 or newer.
+> As of v9.0.0, Mocha requires Node.js v12.0.0 or newer.
 
 ## Getting Started
 
@@ -116,7 +116,7 @@ $ npm test
 
 ## Run Cycle Overview
 
-> Updated for v9.0.0.
+> Updated for v8.0.0.
 
 The following is a mid-level outline of Mocha's "flow of execution" when run in Node.js; the "less important" details have been omitted.
 
@@ -684,7 +684,7 @@ Given Mocha's use of function expressions to define suites and test cases, it's 
 Take the following example:
 
 ```js
-const assert = require('chai').assert;
+const assert = require('assert');
 
 function add(args) {
   return args.reduce((prev, curr) => prev + curr, 0);
@@ -700,7 +700,7 @@ describe('add()', function() {
   tests.forEach(({args, expected}) => {
     it(`correctly adds ${args.length} args`, function() {
       const res = add(args);
-      assert.equal(res, expected);
+      assert.strictEqual(res, expected);
     });
   });
 });
@@ -725,12 +725,40 @@ describe('add()', function() {
   const testAdd = ({args, expected}) =>
     function() {
       const res = add(args);
-      assert.equal(res, expected);
+      assert.strictEqual(res, expected);
     };
 
   it('correctly adds 2 args', testAdd({args: [1, 2], expected: 3}));
   it('correctly adds 3 args', testAdd({args: [1, 2, 3], expected: 6}));
   it('correctly adds 4 args', testAdd({args: [1, 2, 3, 4], expected: 10}));
+});
+```
+
+With `top-level await` you can collect your test data in a dynamic and asynchronous way while the test file is being loaded:
+
+```js
+// testfile.mjs
+import assert from 'assert';
+
+// top-level await: Node >= v14.8.0 with ESM test file
+const tests = await new Promise(resolve => {
+  setTimeout(() => {
+    resolve([
+      {args: [1, 2], expected: 3},
+      {args: [1, 2, 3], expected: 6},
+      {args: [1, 2, 3, 4], expected: 10}
+    ]);
+  }, 5000);
+});
+
+// in suites ASYNCHRONOUS callbacks are NOT supported
+describe('add()', function() {
+  tests.forEach(({args, expected}) => {
+    it(`correctly adds ${args.length} args`, function() {
+      const res = args.reduce((sum, curr) => sum + curr, 0);
+      assert.strictEqual(res, expected);
+    });
+  });
 });
 ```
 
@@ -845,6 +873,12 @@ Use this option to have Mocha check for global variables that are leaked while r
 ### `--compilers`
 
 > _`--compilers` was removed in v6.0.0. See [further explanation and workarounds][mocha-wiki-compilers]._
+
+### `--dry-run`
+
+> _New in v9.0.0._
+
+Report tests without executing any of them, neither tests nor hooks.
 
 ### `--exit`
 
@@ -1037,7 +1071,6 @@ Require a module before loading the user interface or test files. This is useful
 
 - Test harnesses
 - Assertion libraries that augment built-ins or global scope (such as [should.js][npm-should.js])
-- Instant ECMAScript modules via [esm][npm-esm]
 - Compilers such as Babel via [@babel/register][npm-babel-register] or TypeScript via [ts-node][npm-ts-node] (using `--require ts-node/register`). See [Babel][example-babel] or [TypeScript][example-typescript] working examples.
 
 Modules required in this manner are expected to do work synchronously; Mocha won't wait for async tasks in a required module to finish.
@@ -2006,20 +2039,15 @@ this means either ending the file with a `.mjs` extension, or, if you want to us
 adding `"type": "module"` to your `package.json`.
 More information can be found in the [Node.js documentation](https://nodejs.org/api/esm.html).
 
-> Mocha supports ES modules only from Node.js v12.11.0 and above. To enable this in versions smaller than 13.2.0, you need to add `--experimental-modules` when running
-> Mocha. From version 13.2.0 of Node.js, you can use ES modules without any flags.
-> (Mocha _will_ load ESM even in Node v10, but this is not officially supported. Use at your own risk.)
-
 ### Current Limitations
-
-Node.JS native ESM support still has status: **Stability: 1 - Experimental**
 
 - [Watch mode](#-watch-w) does not support ES Module test files
 - [Custom reporters](#third-party-reporters) and [custom interfaces](#interfaces)
   can only be CommonJS files
 - [Configuration file](#configuring-mocha-nodejs) can only be a CommonJS file (`.mocharc.js` or `.mocharc.cjs`)
-- When using module-level mocks via libs like `proxyquire`, `rewiremock` or `rewire`, hold off on using ES modules for your test files
-- Node.JS native ESM support does not work with [esm][npm-esm] module
+- When using module-level mocks via libs like `proxyquire`, `rewiremock` or `rewire`,
+  hold off on using ES modules for your test files. You can switch to using `testdouble`,
+  which does support ESM.
 
 ## Running Mocha in the Browser
 
@@ -2080,6 +2108,7 @@ mocha.setup({
   asyncOnly: true,
   bail: true,
   checkLeaks: true,
+  dryRun: true,
   forbidOnly: true,
   forbidPending: true,
   global: ['MyLib'],
@@ -2237,7 +2266,7 @@ Configurations can inherit from other modules using the `extends` keyword. See [
 
 ## The `test/` Directory
 
-By default, `mocha` looks for the glob `"./test/*.js"`, so you may want to put
+By default, `mocha` looks for the glob `"./test/*.{js,cjs,mjs}"`, so you may want to put
 your tests in `test/` folder. If you want to include subdirectories, pass the
 `--recursive` option.
 
@@ -2398,7 +2427,6 @@ or the [source](https://github.com/mochajs/mocha/blob/master/lib/mocha.js).
 [npm]: https://npmjs.org/
 [npm-babel-register]: https://npm.im/@babel/register
 [npm-chai-as-promised]: https://www.npmjs.com/package/chai-as-promised
-[npm-esm]: https://npm.im/esm
 [npm-glob]: https://www.npmjs.com/package/glob
 [npm-growl]: https://npm.im/growl
 [npm-mocha-lcov-reporter]: https://npm.im/mocha-lcov-reporter

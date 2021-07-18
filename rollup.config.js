@@ -10,6 +10,7 @@ import {babel} from '@rollup/plugin-babel';
 import visualizer from 'rollup-plugin-visualizer';
 
 import pickFromPackageJson from './scripts/pick-from-package-json';
+import {version} from './package.json';
 
 const config = {
   input: './browser-entry.js',
@@ -17,7 +18,9 @@ const config = {
     file: './mocha.js',
     format: 'umd',
     sourcemap: true,
-    name: 'mocha'
+    name: 'mocha',
+    banner: `// mocha@${version} transpiled to javascript ES5`,
+    intro: 'var regeneratorRuntime;'
   },
   plugins: [
     json(),

@@ -1,3 +1,114 @@
+# 9.0.2 / 2021-07-03
+
+## :bug: Fixes
+
+- [#4668](https://github.com/mochajs/mocha/issues/4668): ESM: make `--require <dir>` work with new `import`-first loading ([**@giltayar**](https://github.com/giltayar))
+
+## :nut_and_bolt: Other
+
+- [#4674](https://github.com/mochajs/mocha/issues/4674): Update production dependencies ([**@juergba**](https://github.com/juergba))
+
+# 9.0.1 / 2021-06-18
+
+## :nut_and_bolt: Other
+
+- [#4657](https://github.com/mochajs/mocha/issues/4657): Browser: add separate bundle for modern browsers ([**@juergba**](https://github.com/juergba))
+
+We added a separate browser bundle `mocha-es2018.js` in javascript ES2018, as we skipped the transpilation down to ES5. This is an **experimental step towards freezing Mocha's support of IE11**.
+
+- [#4653](https://github.com/mochajs/mocha/issues/4653): ESM: proper version check in `hasStableEsmImplementation` ([**@alexander-fenster**](https://github.com/alexander-fenster))
+
+# 9.0.0 / 2021-06-07
+
+## :boom: Breaking Changes
+
+- [#4633](https://github.com/mochajs/mocha/issues/4633): **Drop Node.js v10.x support** ([**@juergba**](https://github.com/juergba))
+
+- [#4635](https://github.com/mochajs/mocha/issues/4635): `import`-first loading of test files ([**@giltayar**](https://github.com/giltayar))
+
+**Mocha is going ESM-first!** This means that it will now use ESM `import(test_file)` to load the test files, instead of the CommonJS `require(test_file)`. This is not a problem, as `import` can also load most files that `require` does. In the rare cases where this fails, it will fallback to `require(...)`. This ESM-first approach is the next step in Mocha's ESM migration, and allows ESM loaders to load and transform the test file.
+
+- [#4636](https://github.com/mochajs/mocha/issues/4636): Remove deprecated `utils.lookupFiles()` ([**@juergba**](https://github.com/juergba))
+
+- [#4638](https://github.com/mochajs/mocha/issues/4638): Limit the size of `actual`/`expected` for `diff` generation ([**@juergba**](https://github.com/juergba))
+
+- [#4389](https://github.com/mochajs/mocha/issues/4389): Refactoring: Consuming log-symbols alternate to code for win32 in reporters/base ([**@MoonSupport**](https://github.com/MoonSupport))
+
+## :tada: Enhancements
+
+- [#4640](https://github.com/mochajs/mocha/issues/4640): Add new option `--dry-run` ([**@juergba**](https://github.com/juergba))
+
+## :bug: Fixes
+
+- [#4128](https://github.com/mochajs/mocha/issues/4128): Fix: control stringification of error message ([**@syeutyu**](https://github.com/syeutyu))
+
+## :nut_and_bolt: Other
+
+- [#4646](https://github.com/mochajs/mocha/issues/4646): Deprecate `Runner(suite: Suite, delay: boolean)` signature ([**@juergba**](https://github.com/juergba))
+- [#4643](https://github.com/mochajs/mocha/issues/4643): Update production dependencies ([**@juergba**](https://github.com/juergba))
+
+# 8.4.0 / 2021-05-07
+
+## :tada: Enhancements
+
+- [#4502](https://github.com/mochajs/mocha/issues/4502): CLI file parsing errors now have error codes ([**@evaline-ju**](https://github.com/evaline-ju))
+
+## :bug: Fixes
+
+- [#4614](https://github.com/mochajs/mocha/issues/4614): Watch: fix crash when reloading files ([**@outsideris**](https://github.com/outsideris))
+
+## :book: Documentation
+
+- [#4630](https://github.com/mochajs/mocha/issues/4630): Add `options.require` to Mocha constructor for `root hook` plugins on parallel runs ([**@juergba**](https://github.com/juergba))
+- [#4617](https://github.com/mochajs/mocha/issues/4617): Dynamically generating tests with `top-level await` and ESM test files ([**@juergba**](https://github.com/juergba))
+- [#4608](https://github.com/mochajs/mocha/issues/4608): Update default file extensions ([**@outsideris**](https://github.com/outsideris))
+
+Also thanks to [**@outsideris**](https://github.com/outsideris) for various improvements on our GH actions workflows.
+
+# 8.3.2 / 2021-03-12
+
+## :bug: Fixes
+
+- [#4599](https://github.com/mochajs/mocha/issues/4599): Fix regression in `require` interface ([**@alexander-fenster**](https://github.com/alexander-fenster))
+
+## :book: Documentation
+
+- [#4601](https://github.com/mochajs/mocha/issues/4601): Add build to GH actions run ([**@christian-bromann**](https://github.com/christian-bromann))
+- [#4596](https://github.com/mochajs/mocha/issues/4596): Filter active sponsors/backers ([**@juergba**](https://github.com/juergba))
+- [#4225](https://github.com/mochajs/mocha/issues/4225): Update config file examples ([**@pkuczynski**](https://github.com/pkuczynski))
+
+# 8.3.1 / 2021-03-06
+
+## :bug: Fixes
+
+- [#4577](https://github.com/mochajs/mocha/issues/4577): Browser: fix `EvalError` caused by regenerator-runtime ([**@snoack**](https://github.com/snoack))
+- [#4574](https://github.com/mochajs/mocha/issues/4574): ESM: allow `import` from mocha in parallel mode ([**@nicojs**](https://github.com/nicojs))
+
+# 8.3.0 / 2021-02-11
+
+## :tada: Enhancements
+
+- [#4506](https://github.com/mochajs/mocha/issues/4506): Add error code for test timeout errors ([**@boneskull**](https://github.com/boneskull))
+- [#4112](https://github.com/mochajs/mocha/issues/4112): Add BigInt support to stringify util function ([**@JosejeSinohui**](https://github.com/JosejeSinohui))
+
+## :bug: Fixes
+
+- [#4557](https://github.com/mochajs/mocha/issues/4557): Add file location when SyntaxError happens in ESM ([**@giltayar**](https://github.com/giltayar))
+- [#4521](https://github.com/mochajs/mocha/issues/4521): Fix `require` error when bundling Mocha with Webpack ([**@devhazem**](https://github.com/devhazem))
+
+## :book: Documentation
+
+- [#4507](https://github.com/mochajs/mocha/issues/4507): Add support for typescript-style docstrings ([**@boneskull**](https://github.com/boneskull))
+- [#4503](https://github.com/mochajs/mocha/issues/4503): Add GH Actions workflow status badge ([**@outsideris**](https://github.com/outsideris))
+- [#4494](https://github.com/mochajs/mocha/issues/4494): Add example of generating tests dynamically with a closure ([**@maxwellgerber**](https://github.com/maxwellgerber))
+
+## :nut_and_bolt: Other
+
+- [#4556](https://github.com/mochajs/mocha/issues/4556): Upgrade all dependencies to latest stable ([**@AviVahl**](https://github.com/AviVahl))
+- [#4543](https://github.com/mochajs/mocha/issues/4543): Update dependencies yargs and yargs-parser ([**@juergba**](https://github.com/juergba))
+
+Also thanks to [**@outsideris**](https://github.com/outsideris) and [**@HyunSangHan**](https://github.com/HyunSangHan) for various fixes to our website and documentation.
+
 # 8.2.1 / 2020-11-02
 
 Fixed stuff.
